@@ -1,0 +1,946 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>🌸 Mission Slimpossible 2026</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --pink:#ff6eb4;--pink2:#ffb3d9;--purple:#c084fc;--purple2:#e9d5ff;
+  --peach:#ffb347;--mint:#6ee7b7;--sky:#7dd3fc;--yellow:#fde68a;
+  --bg:#fff5f9;--card:#ffffff;--text:#5b3a6b;--muted:#b48ec0;
+  --border:#f0d6f5;--success:#34d399;--danger:#fb7185;
+  --shadow:0 4px 24px rgba(192,132,252,0.13);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+  background-image:radial-gradient(circle at 10% 20%,#ffd6ec44 0%,transparent 40%),radial-gradient(circle at 90% 80%,#e9d5ff44 0%,transparent 40%);}
+
+#syncBar{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;align-items:center;justify-content:center;gap:8px;padding:5px 16px;font-size:.76rem;font-weight:700;font-family:'Nunito',sans-serif;transition:background .4s;}
+#syncBar.connecting{background:linear-gradient(90deg,#c084fc,#f472b6);color:#fff;}
+#syncBar.online{background:linear-gradient(90deg,#34d399,#6ee7b7);color:#fff;}
+#syncBar.offline{background:linear-gradient(90deg,#fb923c,#f59e0b);color:#fff;}
+#syncBar.error{background:linear-gradient(90deg,#fb7185,#f43f5e);color:#fff;}
+#syncBar .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.85);animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+header{background:linear-gradient(135deg,#ff6eb4,#c084fc,#7dd3fc);padding:58px 20px 28px;text-align:center;border-radius:0 0 40px 40px;box-shadow:0 8px 30px rgba(192,132,252,.3);position:relative;overflow:hidden;}
+header::before{content:'🌸✨💪🌸✨💪🌸✨💪🌸✨💪';position:absolute;top:8px;left:0;right:0;font-size:1rem;opacity:.22;letter-spacing:4px;white-space:nowrap;}
+header h1{font-size:clamp(1.5rem,4.5vw,2.4rem);font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.15);}
+header p{color:rgba(255,255,255,.9);font-size:.9rem;font-weight:600;margin-top:6px;}
+.countdown-bar{display:flex;justify-content:center;gap:12px;margin-top:14px;flex-wrap:wrap;}
+.cd-box{background:rgba(255,255,255,.25);border-radius:14px;padding:8px 16px;text-align:center;backdrop-filter:blur(4px);min-width:64px;}
+.cd-num{font-size:1.4rem;font-weight:900;color:#fff;line-height:1;}
+.cd-lbl{font-size:.65rem;font-weight:700;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:.5px;}
+
+nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:14px 12px;background:#fff;position:sticky;top:29px;z-index:100;box-shadow:0 4px 16px rgba(192,132,252,.12);}
+nav button{background:#fdf4ff;border:2px solid var(--border);color:var(--purple);padding:8px 16px;border-radius:30px;cursor:pointer;font-size:.84rem;font-weight:700;font-family:'Nunito',sans-serif;transition:all .2s;}
+nav button:hover,nav button.active{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-color:transparent;transform:translateY(-2px);box-shadow:0 4px 12px rgba(192,132,252,.35);}
+
+.section{display:none;max-width:1100px;margin:24px auto;padding:0 16px;}
+.section.active{display:block;}
+
+.card{background:var(--card);border-radius:24px;padding:24px;margin-bottom:20px;border:2px solid var(--border);box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--sky));border-radius:4px 4px 0 0;}
+.card h2{color:var(--purple);font-size:1.1rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+.avatar-wrap{width:72px;height:72px;margin:0 auto 8px;}
+.avatar-wrap svg{width:100%;height:100%;}
+
+.profiles{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:8px;}
+.profile-btn{background:linear-gradient(135deg,#fdf4ff,#fce7f3);border:2.5px solid var(--border);border-radius:22px;padding:18px 20px;cursor:pointer;text-align:center;transition:all .25s;min-width:115px;}
+.profile-btn:hover{transform:translateY(-5px);box-shadow:0 8px 20px rgba(192,132,252,.25);border-color:var(--pink);}
+.profile-btn.selected{background:linear-gradient(135deg,#ffb3d9,#e9d5ff);border-color:var(--pink);transform:translateY(-5px);box-shadow:0 8px 24px rgba(255,110,180,.3);}
+.profile-btn .pname{color:var(--text);font-weight:800;font-size:.9rem;margin-top:4px;}
+.profile-btn .pweight{color:var(--pink);font-size:.8rem;font-weight:700;margin-top:3px;}
+.profile-btn .pgender{font-size:.7rem;color:var(--muted);font-weight:700;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;}
+.stat-box{background:linear-gradient(135deg,#fdf4ff,#fce7f3);border:2px solid var(--border);border-radius:16px;padding:14px 10px;text-align:center;}
+.stat-box .val{font-size:1.35rem;font-weight:900;color:var(--purple);line-height:1.2;}
+.stat-box .lbl{font-size:.7rem;color:var(--muted);font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.4px;}
+
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;}
+label{display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:5px;}
+input,select,textarea{width:100%;background:#fdf4ff;border:2px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-size:.9rem;font-family:'Nunito',sans-serif;font-weight:600;transition:border .2s,box-shadow .2s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,110,180,.12);}
+select option{background:#fff;color:var(--text);}
+
+.btn{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:30px;padding:11px 22px;cursor:pointer;font-size:.9rem;font-weight:800;font-family:'Nunito',sans-serif;transition:all .2s;box-shadow:0 4px 12px rgba(192,132,252,.3);}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(192,132,252,.45);opacity:.92;}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn.secondary{background:linear-gradient(135deg,#e0f2fe,#f0e6ff);color:var(--purple);box-shadow:0 4px 12px rgba(192,132,252,.1);}
+.btn.danger{background:linear-gradient(135deg,#fb7185,#f43f5e);box-shadow:0 4px 12px rgba(251,113,133,.3);}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
+
+.toast{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;padding:14px 22px;border-radius:16px;font-weight:800;font-family:'Nunito',sans-serif;z-index:9999;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;box-shadow:0 8px 24px rgba(192,132,252,.4);max-width:320px;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.error{background:linear-gradient(135deg,#fb7185,#f43f5e);}
+.toast.warning{background:linear-gradient(135deg,#fb923c,#f59e0b);}
+
+#offlineBanner{display:none;background:linear-gradient(135deg,#fff7ed,#fef3c7);border:2px solid #fb923c;border-radius:16px;padding:14px 18px;margin-bottom:16px;font-size:.84rem;font-weight:700;color:#92400e;}
+#offlineBanner.show{display:block;}
+
+.table-wrap{overflow-x:auto;border-radius:14px;}
+table{width:100%;border-collapse:collapse;font-size:.83rem;}
+th{background:linear-gradient(135deg,#fce7f3,#f3e8ff);color:var(--purple);padding:12px 14px;text-align:left;white-space:nowrap;font-weight:800;}
+td{padding:10px 14px;border-bottom:1.5px solid var(--border);white-space:nowrap;font-weight:600;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fdf4ff;}
+
+.lb-item{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#fdf4ff,#fce7f3);border:2px solid var(--border);border-radius:18px;padding:14px 20px;margin-bottom:12px;transition:transform .2s;}
+.lb-item:hover{transform:translateX(5px);}
+.lb-item:first-child{background:linear-gradient(135deg,#fff7d6,#fce7f3);border-color:#fbbf24;box-shadow:0 4px 16px rgba(251,191,36,.2);}
+.lb-rank{font-size:1.8rem;min-width:44px;text-align:center;}
+.lb-name{flex:1;font-weight:800;font-size:1rem;}
+.lb-lost{color:var(--success);font-weight:900;font-size:1.1rem;}
+.lb-avatar{width:48px;height:48px;}.lb-avatar svg{width:100%;height:100%;}
+
+.tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.tip-card{background:linear-gradient(135deg,#fdf4ff,#e0f2fe);border:2px solid var(--border);border-radius:18px;padding:18px;transition:transform .2s;}
+.tip-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+.tip-card .tip-num{color:var(--pink);font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.tip-card strong{color:var(--purple);font-size:.95rem;}
+.tip-card p{font-size:.85rem;color:var(--text);line-height:1.6;margin-top:6px;}
+
+.chart-wrap{position:relative;height:340px;}
+.toggle-btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.toggle-btn{padding:6px 14px;border-radius:20px;border:2px solid;cursor:pointer;font-size:.8rem;font-weight:800;font-family:'Nunito',sans-serif;transition:all .2s;}
+
+.snapshot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;}
+.snap-card{background:linear-gradient(135deg,#fdf4ff,#e0f2fe);border:2px solid var(--border);border-radius:20px;padding:18px;text-align:center;transition:transform .2s;}
+.snap-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);}
+.snap-card .sname{font-weight:900;color:var(--purple);margin-bottom:8px;font-size:.95rem;}
+.snap-card .sval{font-size:1.25rem;font-weight:900;color:var(--text);}
+.snap-card .slbl{font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.snap-card .sbadge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:800;margin-top:8px;}
+.snap-avatar{width:60px;height:60px;margin:0 auto 10px;}.snap-avatar svg{width:100%;height:100%;}
+.loss{color:#059669;}.gain{color:#e11d48;}
+
+.member-mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+.member-mini{background:linear-gradient(135deg,#fdf4ff,#fce7f3);border:2px solid var(--border);border-radius:18px;padding:16px;display:flex;align-items:center;gap:12px;transition:all .2s;cursor:pointer;}
+.member-mini:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--pink);}
+.member-mini .mini-avatar{width:52px;height:52px;flex-shrink:0;}.member-mini .mini-avatar svg{width:100%;height:100%;}
+.member-mini .mini-name{font-weight:800;font-size:.95rem;color:var(--text);}
+.member-mini .mini-weight{font-size:.82rem;font-weight:700;color:var(--pink);margin-top:2px;}
+.member-mini .mini-lost{font-size:.75rem;font-weight:700;margin-top:2px;}
+
+.progress-label{display:flex;justify-content:space-between;font-size:.83rem;font-weight:700;color:var(--muted);margin-bottom:8px;}
+.progress-track{background:#f0d6f5;border-radius:30px;height:18px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:30px;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width 1s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;}
+.progress-fill span{font-size:.7rem;font-weight:900;color:#fff;}
+.week-dots{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.week-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:var(--muted);background:#fdf4ff;}
+.week-dot.done{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-color:transparent;}
+.week-dot.current{background:linear-gradient(135deg,var(--yellow),var(--peach));color:#fff;border-color:transparent;box-shadow:0 0 0 3px rgba(255,179,71,.3);}
+
+.quote-card{background:linear-gradient(135deg,#ff6eb4,#c084fc);border-radius:20px;padding:20px 24px;margin-bottom:20px;text-align:center;box-shadow:0 6px 20px rgba(192,132,252,.3);}
+.quote-card p{color:#fff;font-size:1rem;font-weight:700;line-height:1.6;font-style:italic;}
+.quote-card .quote-author{color:rgba(255,255,255,.75);font-size:.78rem;margin-top:8px;font-weight:700;}
+
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.rule-item{background:linear-gradient(135deg,#fdf4ff,#e0f2fe);border:2px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px;}
+.rule-num{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;flex-shrink:0;margin-top:1px;}
+.rule-text{font-size:.84rem;font-weight:700;color:var(--text);line-height:1.5;}
+
+.profile-detail{display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,#fdf4ff,#fce7f3);border-radius:20px;padding:20px;margin-bottom:16px;border:2px solid var(--border);}
+.profile-detail .pd-avatar{width:90px;height:90px;margin-bottom:10px;}.profile-detail .pd-avatar svg{width:100%;height:100%;}
+.profile-detail .pd-name{font-size:1.3rem;font-weight:900;color:var(--text);}
+.profile-detail .pd-sub{font-size:.8rem;color:var(--muted);font-weight:700;}
+
+.bmi-ref{width:100%;border-collapse:collapse;font-size:.83rem;margin-top:12px;}
+.bmi-ref th{background:linear-gradient(135deg,#fce7f3,#f3e8ff);color:var(--purple);padding:10px 14px;font-weight:800;}
+.bmi-ref td{padding:10px 14px;border-bottom:1.5px solid var(--border);font-weight:600;}
+#calcResult{display:none;margin-top:18px;}
+.result-box{background:linear-gradient(135deg,#fdf4ff,#fce7f3);border:2px solid var(--border);border-radius:16px;padding:18px;}
+.sticker{display:inline-block;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-radius:20px;padding:4px 14px;font-size:.74rem;font-weight:800;margin-left:8px;vertical-align:middle;}
+.info-tip{background:linear-gradient(135deg,#e0f2fe,#f3e8ff);border-left:4px solid var(--purple);border-radius:12px;padding:10px 14px;font-size:.82rem;color:var(--muted);font-weight:700;margin-top:14px;}
+
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}.btn-row{flex-direction:column;}header{border-radius:0 0 28px 28px;}}
+</style>
+</head>
+<body>
+
+<div id="syncBar" class="connecting">
+  <span class="dot"></span>
+  <span id="syncMsg">🌸 Connecting to Firebase…</span>
+</div>
+
+<header>
+  <h1>🔥 Mission Slimpossible 2026 ✨</h1>
+  <p>27 April – 27 July 2026 &nbsp;•&nbsp; 5 Warriors Strong &nbsp;•&nbsp; 13 Weeks 💪</p>
+  <div class="countdown-bar">
+    <div class="cd-box"><div class="cd-num" id="cd-d">--</div><div class="cd-lbl">Days</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-h">--</div><div class="cd-lbl">Hours</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-m">--</div><div class="cd-lbl">Mins</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-s">--</div><div class="cd-lbl">Secs</div></div>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('dashboard',this)">🏠 Dashboard</button>
+  <button onclick="showSection('log',this)">📝 Log Entry</button>
+  <button onclick="showSection('calc',this)">🧮 Calorie Calc</button>
+  <button onclick="showSection('charts',this)">📊 Charts</button>
+  <button onclick="showSection('leaderboard',this)">🏆 Leaderboard</button>
+  <button onclick="showSection('tips',this)">💡 Diet Tips</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section active">
+  <div class="quote-card">
+    <p id="quoteText">"Every step forward is a step away from where you used to be." 🌸</p>
+    <div class="quote-author" id="quoteAuthor">— Daily Motivation</div>
+  </div>
+  <div class="card">
+    <h2>🗓️ Mission Progress</h2>
+    <div style="margin-bottom:12px">
+      <div class="progress-label"><span>Week <span id="currentWeekNum">1</span> of 13</span><span id="progressPct">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"><span id="progressFillPct"></span></div></div>
+    </div>
+    <div class="week-dots" id="weekDots"></div>
+    <p style="font-size:.78rem;color:var(--muted);font-weight:700;margin-top:12px;text-align:center">🏁 End: 27 July 2026 &nbsp;|&nbsp; 🚀 Start: 27 April 2026</p>
+  </div>
+  <div class="card">
+    <h2>👥 Choose Your Profile <span class="sticker">Click your name! 👆</span></h2>
+    <div class="profiles" id="profileBtns"></div>
+  </div>
+  <div class="card" id="profileCard" style="display:none">
+    <h2>🎯 My Stats — <span id="profileName"></span></h2>
+    <div id="profileDetailWrap"></div>
+    <div class="stats-grid" id="profileStats" style="margin-top:14px"></div>
+  </div>
+  <div class="card" id="latestCard" style="display:none">
+    <h2>📅 My Latest Entry</h2>
+    <div id="latestEntry"></div>
+  </div>
+  <div class="card">
+    <h2>👀 All Warriors — Quick Overview</h2>
+    <div class="member-mini-grid" id="memberMiniGrid"></div>
+  </div>
+  <div class="card">
+    <h2>📋 Challenge Rules & Info</h2>
+    <div class="rules-grid">
+      <div class="rule-item"><div class="rule-num">1</div><div class="rule-text">Log your weight <strong>every week</strong> ✅</div></div>
+      <div class="rule-item"><div class="rule-num">2</div><div class="rule-text">Record <strong>daily calorie intake</strong> honestly 🍽️</div></div>
+      <div class="rule-item"><div class="rule-num">3</div><div class="rule-text">Track <strong>calories burned</strong> daily 🏃</div></div>
+      <div class="rule-item"><div class="rule-num">4</div><div class="rule-text">Be honest — this is for <strong>your health</strong> 💪</div></div>
+      <div class="rule-item"><div class="rule-num">5</div><div class="rule-text"><strong>Cheer your teammates</strong> on! 🎉</div></div>
+      <div class="rule-item"><div class="rule-num">6</div><div class="rule-text"><strong>13 weeks</strong>: 27 Apr – 27 Jul 2026 🗓️</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOG ENTRY -->
+<div id="log" class="section">
+  <div class="card">
+    <h2>📝 Log Weekly Entry</h2>
+    <div id="offlineBanner">⚠️ <strong>Not connected to Firebase.</strong> Entry saved locally on this device only. Check your internet connection or Firebase setup.</div>
+    <p style="color:var(--muted);font-size:.85rem;font-weight:700;margin-bottom:18px">Select your name, choose the week, then fill in your data ✍️</p>
+    <div class="form-grid">
+      <div><label>👤 Your Name</label>
+        <select id="logName" onchange="onNameChange()">
+          <option value="">— Select your name —</option>
+        </select>
+      </div>
+      <div><label>📅 Week</label><select id="logWeek"></select></div>
+      <div><label>⚖️ Weight (kg)</label><input type="number" id="logWeight" placeholder="e.g. 72.5" step="0.1" min="30" max="300"/></div>
+      <div><label>📏 Height (cm) <small style="color:var(--pink)">(first time only)</small></label><input type="number" id="logHeight" placeholder="e.g. 170" step="0.1" min="100" max="250"/></div>
+      <div><label>🍽️ Daily Calorie Intake (kcal)</label><input type="number" id="logCalIn" placeholder="e.g. 1800" min="0"/></div>
+      <div><label>🏃 Daily Calorie Burned (kcal)</label><input type="number" id="logCalBurn" placeholder="e.g. 300" min="0"/></div>
+      <div style="grid-column:1/-1"><label>📝 Note (optional)</label><textarea id="logNote" rows="2" placeholder="How are you feeling this week? 💭"></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="saveBtn" onclick="saveEntry()">💾 Save Entry</button>
+      <button class="btn secondary" onclick="exportCSV()">📥 Export CSV</button>
+      <button class="btn danger" onclick="resetAll()">🗑️ Reset All Data</button>
+    </div>
+    <div class="info-tip">ℹ️ Same week entry overwrites previous. Height auto-fills from last entry.</div>
+  </div>
+  <div class="card">
+    <h2>📋 All Entries — <span id="allEntriesName" style="color:var(--pink)">Select a name above</span></h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>📅 Week</th><th>⚖️ Weight</th><th>📉 BMI</th><th>🍽️ Cal In</th><th>🏃 Cal Burned</th><th>⚡ Net</th><th>📝 Note</th></tr></thead>
+        <tbody id="allEntriesTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CALORIE CALC -->
+<div id="calc" class="section">
+  <div class="card">
+    <h2>🧮 Daily Calorie Need Calculator</h2>
+    <p style="color:var(--muted);font-size:.83rem;font-weight:700;margin-bottom:16px">Revised Harris-Benedict Equation ✨</p>
+    <div class="form-grid">
+      <div><label>👤 Gender</label><select id="cGender"><option value="male">Male</option><option value="female">Female</option></select></div>
+      <div><label>🎂 Age</label><input type="number" id="cAge" placeholder="e.g. 30"/></div>
+      <div><label>⚖️ Weight (kg)</label><input type="number" id="cWeight" placeholder="e.g. 80" step="0.1"/></div>
+      <div><label>📏 Height (cm)</label><input type="number" id="cHeight" placeholder="e.g. 170" step="0.1"/></div>
+      <div style="grid-column:1/-1"><label>🏃 Activity Level</label>
+        <select id="cActivity">
+          <option value="1.2">Sedentary — desk job, little/no exercise</option>
+          <option value="1.375">Lightly Active — 1–3 days/week</option>
+          <option value="1.55">Moderately Active — 3–5 days/week</option>
+          <option value="1.725">Very Active — 6–7 days/week</option>
+          <option value="1.9">Extra Active — athlete/physical job</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn" onclick="calcCalories()">✨ Calculate!</button></div>
+    <div id="calcResult"><div class="result-box" id="calcOutput"></div></div>
+    <div style="margin-top:20px;background:linear-gradient(135deg,#fdf4ff,#e0f2fe);border-radius:14px;padding:16px;font-size:.82rem;font-weight:700;color:var(--muted);line-height:2">
+      <strong style="color:var(--purple)">📐 Formulas:</strong><br>
+      BMI = weight ÷ height(m)² | TDEE = BMR × Activity | Goal = TDEE − 500 kcal/day
+    </div>
+  </div>
+  <div class="card">
+    <h2>📊 BMI Reference Chart</h2>
+    <table class="bmi-ref">
+      <thead><tr><th>BMI</th><th>Category</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>&lt;18.5</td><td style="color:#7dd3fc">Underweight</td><td>Increase weight via healthy eating</td></tr>
+        <tr><td>18.5–24.9</td><td style="color:#34d399">✅ Healthy</td><td>Ideal — maintain your lifestyle!</td></tr>
+        <tr><td>25–29.9</td><td style="color:#fb923c">⚠️ Overweight</td><td>Moderate lifestyle changes needed</td></tr>
+        <tr><td>≥30</td><td style="color:#fb7185">❗ Obese</td><td>Consult a healthcare professional</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div id="charts" class="section">
+  <div class="card">
+    <h2>📊 Group Comparison Charts</h2>
+    <div style="margin-bottom:10px"><span style="font-size:.82rem;font-weight:800;color:var(--purple)">👁️ Toggle:</span>
+      <div class="toggle-btns" id="memberToggles"></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
+      <button class="btn" onclick="setChartMode('weight')">⚖️ Weight</button>
+      <button class="btn secondary" onclick="setChartMode('bmi')">📉 BMI</button>
+      <button class="btn secondary" onclick="setChartMode('calIn')">🍽️ Cal In</button>
+      <button class="btn secondary" onclick="setChartMode('calBurn')">🏃 Cal Burned</button>
+      <button class="btn secondary" onclick="setChartMode('net')">⚡ Net</button>
+      <button class="btn secondary" onclick="setChartMode('lost')">📉 Lost</button>
+    </div>
+    <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+  </div>
+  <div class="card"><h2>🔍 Individual Snapshots</h2><div class="snapshot-grid" id="snapshotGrid"></div></div>
+  <div class="card">
+    <h2>🍽️ Weekly Calorie Comparison</h2>
+    <div style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <label style="margin:0">📅 Week:</label>
+      <select id="calWeekSel" onchange="renderCalWeekChart()" style="width:auto;min-width:130px"></select>
+    </div>
+    <div class="chart-wrap"><canvas id="calWeekChart"></canvas></div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="leaderboard" class="section">
+  <div class="card">
+    <h2>🏆 Weight Loss Leaderboard</h2>
+    <p style="color:var(--muted);font-size:.83rem;font-weight:700;margin-bottom:16px">Ranked by total kg lost 🔥</p>
+    <div id="lbList"></div>
+  </div>
+  <div class="card">
+    <h2>📊 All Members — Latest Stats</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>👤</th><th>📅 Week</th><th>⚖️ Weight</th><th>📉 BMI</th><th>🏃 Lost</th><th>🍽️ Cal In</th><th>🔥 Burned</th></tr></thead>
+        <tbody id="summaryTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TIPS -->
+<div id="tips" class="section">
+  <div class="card">
+    <h2>💡 Diet & Wellness Tips <span class="sticker">12 Tips 💪</span></h2>
+    <div class="tips-grid" id="tipsGrid"></div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:24px 16px 32px;color:var(--muted);font-size:.8rem;font-weight:700">
+  🎯 Mission Slimpossible 2026 · We Got This! 💪🔥
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  ✅ YOUR FIREBASE CONFIG — ALREADY SET UP!
+// ═══════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey:            "AIzaSyBnT0_Bojdp3dq2vV7hGPKPf18w2pzNrwQ",
+  authDomain:        "mission-slimpossible-2026.firebaseapp.com",
+  databaseURL:       "https://mission-slimpossible-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "mission-slimpossible-2026",
+  storageBucket:     "mission-slimpossible-2026.firebasestorage.app",
+  messagingSenderId: "894052895127",
+  appId:             "1:894052895127:web:e06572b0d04967fe335cd2"
+};
+// ═══════════════════════════════════════════════════
+
+let db = null, dataRef = null, firebaseReady = false;
+const LS_KEY = 'slimpossible2026_data';
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+  dataRef = db.ref('missionSlimpossible2026');
+  firebaseReady = true;
+} catch(e) {
+  console.warn('Firebase init error:', e);
+}
+
+// ── SVG AVATARS ──
+function svgMale(skin, shirt, hair) {
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="95" rx="22" ry="5" fill="rgba(0,0,0,0.07)"/>
+    <rect x="28" y="62" width="44" height="30" rx="14" fill="${shirt}"/>
+    <rect x="43" y="56" width="14" height="12" rx="5" fill="${skin}"/>
+    <ellipse cx="50" cy="46" rx="22" ry="24" fill="${skin}"/>
+    <ellipse cx="50" cy="26" rx="22" ry="12" fill="${hair}"/>
+    <rect x="28" y="26" width="44" height="10" rx="4" fill="${hair}"/>
+    <ellipse cx="28" cy="47" rx="5" ry="7" fill="${skin}"/>
+    <ellipse cx="72" cy="47" rx="5" ry="7" fill="${skin}"/>
+    <ellipse cx="41" cy="47" rx="5" ry="5.5" fill="white"/>
+    <ellipse cx="59" cy="47" rx="5" ry="5.5" fill="white"/>
+    <circle cx="42" cy="48" r="3" fill="#3b2000"/>
+    <circle cx="60" cy="48" r="3" fill="#3b2000"/>
+    <circle cx="43" cy="47" r="1" fill="white"/>
+    <circle cx="61" cy="47" r="1" fill="white"/>
+    <path d="M37 41 Q41 38 45 41" stroke="${hair}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M55 41 Q59 38 63 41" stroke="${hair}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="50" cy="54" rx="3" ry="2" fill="${skin}" stroke="rgba(0,0,0,0.1)" stroke-width="1"/>
+    <path d="M43 60 Q50 66 57 60" stroke="#e05080" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="38" cy="57" rx="5" ry="3" fill="#ffb3c6" opacity=".5"/>
+    <ellipse cx="62" cy="57" rx="5" ry="3" fill="#ffb3c6" opacity=".5"/>
+    <path d="M38 64 L50 72 L62 64" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+function svgFemaleHijab(skin, outfit, hijab) {
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="95" rx="22" ry="5" fill="rgba(0,0,0,0.07)"/>
+    <rect x="26" y="62" width="48" height="30" rx="14" fill="${outfit}"/>
+    <rect x="43" y="57" width="14" height="10" rx="5" fill="${skin}"/>
+    <ellipse cx="50" cy="46" rx="22" ry="23" fill="${skin}"/>
+    <ellipse cx="50" cy="38" rx="26" ry="22" fill="${hijab}"/>
+    <ellipse cx="50" cy="70" rx="30" ry="18" fill="${hijab}"/>
+    <ellipse cx="50" cy="48" rx="18" ry="20" fill="${skin}"/>
+    <ellipse cx="42" cy="47" rx="5" ry="5.5" fill="white"/>
+    <ellipse cx="58" cy="47" rx="5" ry="5.5" fill="white"/>
+    <circle cx="43" cy="48" r="3" fill="#3b2000"/>
+    <circle cx="59" cy="48" r="3" fill="#3b2000"/>
+    <circle cx="44" cy="47" r="1" fill="white"/>
+    <circle cx="60" cy="47" r="1" fill="white"/>
+    <path d="M38 41 Q42 38 46 41" stroke="#3b2000" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M54 41 Q58 38 62 41" stroke="#3b2000" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="50" cy="54" rx="3" ry="2" fill="${skin}" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+    <path d="M44 60 Q50 66 56 60" stroke="#e05080" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="38" cy="57" rx="5" ry="3" fill="#ffb3c6" opacity=".55"/>
+    <ellipse cx="62" cy="57" rx="5" ry="3" fill="#ffb3c6" opacity=".55"/>
+    <circle cx="50" cy="68" r="3" fill="white" opacity=".6"/>
+  </svg>`;
+}
+
+// ── MEMBERS ──
+const MEMBERS = [
+  { name:"Shahrul", gender:"male",   color:"#7dd3fc", svgFn:()=>svgMale("#f5c5a3","#7dd3fc","#3b2000") },
+  { name:"Najib",   gender:"male",   color:"#6ee7b7", svgFn:()=>svgMale("#e8b89a","#6ee7b7","#1a0a00") },
+  { name:"Aiman",   gender:"male",   color:"#a78bfa", svgFn:()=>svgMale("#fcd9b6","#a78bfa","#5b3a00") },
+  { name:"Su",      gender:"female", color:"#ff6eb4", svgFn:()=>svgFemaleHijab("#f5c5a3","#ff6eb4","#6b2d6b") },
+  { name:"Lena",    gender:"female", color:"#fbbf24", svgFn:()=>svgFemaleHijab("#fcd9b6","#fbbf24","#7c3a00") }
+];
+const WEEKS      = Array.from({length:13},(_,i)=>`Week ${i+1}`);
+const END_DATE   = new Date('2026-07-27T23:59:59');
+const START_DATE = new Date('2026-04-27T00:00:00');
+const QUOTES = [
+  {text:"Every step forward is a step away from where you used to be.",author:"— Daily Motivation 🌸"},
+  {text:"You didn't come this far to only come this far. Keep going!",author:"— Mission Slimpossible 💪"},
+  {text:"Your body can do it. It's time to convince your mind.",author:"— Fitness Wisdom 🧠"},
+  {text:"Small daily improvements are the key to staggering long-term results.",author:"— Anonymous 🌟"},
+  {text:"Sweat is just fat crying. Keep going warriors!",author:"— Mission Slimpossible 🔥"},
+  {text:"It always seems impossible until it's done.",author:"— Nelson Mandela ✨"},
+  {text:"Don't wish for a good body. Work for it!",author:"— Gym Life 💪"}
+];
+
+let allData={}, selectedMember=null, chartMode='weight';
+let mainChartInst=null, calWeekInst=null, visibleMembers={};
+let isOnline=false;
+
+function loadLocal(){try{return JSON.parse(localStorage.getItem(LS_KEY))||{};}catch(e){return {};}}
+function saveLocal(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
+function setSyncBar(state,msg){document.getElementById('syncBar').className=state;document.getElementById('syncMsg').textContent=msg;}
+
+// ── FIREBASE LISTENERS ──
+if(firebaseReady && dataRef){
+  dataRef.on('value', snap=>{
+    isOnline=true;
+    allData=snap.val()||{};
+    saveLocal(allData);
+    setSyncBar('online','🟢 Live — synced across all devices! 🌸');
+    document.getElementById('offlineBanner').classList.remove('show');
+    renderAll();
+  }, ()=>{
+    isOnline=false;
+    allData=loadLocal();
+    setSyncBar('offline','🟠 Offline — using local data');
+    document.getElementById('offlineBanner').classList.add('show');
+    renderAll();
+  });
+  db.ref('.info/connected').on('value', snap=>{
+    isOnline=!!snap.val();
+    if(!isOnline){
+      setSyncBar('offline','🟠 Offline — will sync when reconnected');
+      document.getElementById('offlineBanner').classList.add('show');
+    }
+  });
+} else {
+  allData=loadLocal();
+  setSyncBar('error','⚠️ Firebase error — local only');
+  document.getElementById('offlineBanner').classList.add('show');
+  renderAll();
+}
+
+// ── HELPERS ──
+function weekNum(w){return parseInt(String(w).replace(/Week /,'').replace(/_/g,' '))||0;}
+function sortedWeeks(e){return Object.keys(e).sort((a,b)=>weekNum(a)-weekNum(b));}
+function getBmiCat(b){
+  if(b<18.5) return{label:'Underweight',color:'#7dd3fc'};
+  if(b<25)   return{label:'Healthy ✅',color:'#34d399'};
+  if(b<30)   return{label:'Overweight ⚠️',color:'#fb923c'};
+  return{label:'Obese ❗',color:'#fb7185'};
+}
+
+// ── INIT ──
+function init(){
+  ['logWeek','calWeekSel'].forEach(id=>{
+    const el=document.getElementById(id);
+    WEEKS.forEach(w=>{el.innerHTML+=`<option>${w}</option>`;});
+  });
+  const ln=document.getElementById('logName');
+  MEMBERS.forEach(m=>{
+    ln.innerHTML+=`<option value="${m.name}">${m.gender==='male'?'👨':'👩'} ${m.name}</option>`;
+    visibleMembers[m.name]=true;
+  });
+  renderTips(); renderQuote(); renderMissionProgress(); startCountdown();
+  renderProfileBtns(); renderMemberMiniGrid();
+}
+
+function startCountdown(){
+  function u(){
+    const diff=END_DATE-new Date();
+    if(diff<=0){['cd-d','cd-h','cd-m','cd-s'].forEach((id,i)=>document.getElementById(id).textContent=['🎉','Done','!','🔥'][i]);return;}
+    document.getElementById('cd-d').textContent=String(Math.floor(diff/86400000)).padStart(2,'0');
+    document.getElementById('cd-h').textContent=String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('cd-m').textContent=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    document.getElementById('cd-s').textContent=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+  }
+  u(); setInterval(u,1000);
+}
+
+function renderQuote(){
+  const q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
+  document.getElementById('quoteText').textContent=`"${q.text}"`;
+  document.getElementById('quoteAuthor').textContent=q.author;
+}
+
+function renderMissionProgress(){
+  const now=new Date();
+  const total=END_DATE-START_DATE;
+  const elapsed=Math.max(0,Math.min(now-START_DATE,total));
+  const pct=Math.round((elapsed/total)*100);
+  const wk=Math.min(13,Math.max(1,Math.ceil(elapsed/(7*86400000))));
+  document.getElementById('currentWeekNum').textContent=wk;
+  document.getElementById('progressPct').textContent=pct+'%';
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressFillPct').textContent=pct>8?pct+'%':'';
+  const dotsEl=document.getElementById('weekDots');dotsEl.innerHTML='';
+  for(let i=1;i<=13;i++){
+    const d=document.createElement('div');
+    d.className='week-dot'+(i<wk?' done':i===wk?' current':'');
+    d.textContent='W'+i;dotsEl.appendChild(d);
+  }
+}
+
+function renderAll(){
+  renderProfileBtns(); renderMemberMiniGrid();
+  if(selectedMember) renderProfile(selectedMember);
+  renderAllEntriesTable();
+  if(document.getElementById('charts').classList.contains('active')) renderCharts();
+  renderLeaderboard(); renderSummary(); renderSnapshots();
+}
+
+function renderProfileBtns(){
+  const c=document.getElementById('profileBtns');c.innerHTML='';
+  MEMBERS.forEach(m=>{
+    const entries=allData[m.name]||{};
+    const wks=sortedWeeks(entries);
+    const latest=wks.length?entries[wks[wks.length-1]]:null;
+    const div=document.createElement('div');
+    div.className='profile-btn'+(selectedMember===m.name?' selected':'');
+    div.innerHTML=`
+      <div class="avatar-wrap">${m.svgFn()}</div>
+      <div class="pname">${m.name}</div>
+      <div class="pgender">${m.gender==='male'?'♂ Male':'♀ Female'}</div>
+      <div class="pweight">${latest?latest.weight+' kg':'Tap to view 👆'}</div>`;
+    div.onclick=()=>{
+      selectedMember=m.name; renderAll();
+      setTimeout(()=>document.getElementById('profileCard').scrollIntoView({behavior:'smooth',block:'start'}),100);
+    };
+    c.appendChild(div);
+  });
+}
+
+function renderMemberMiniGrid(){
+  const c=document.getElementById('memberMiniGrid');c.innerHTML='';
+  MEMBERS.forEach(m=>{
+    const entries=allData[m.name]||{};
+    const wks=sortedWeeks(entries);
+    const first=wks.length?entries[wks[0]]:null;
+    const latest=wks.length?entries[wks[wks.length-1]]:null;
+    const lost=first&&latest?(first.weight-latest.weight).toFixed(1):null;
+    const div=document.createElement('div');div.className='member-mini';
+    div.innerHTML=`
+      <div class="mini-avatar">${m.svgFn()}</div>
+      <div class="mini-info">
+        <div class="mini-name">${m.name}</div>
+        <div class="mini-weight">${latest?latest.weight+' kg':'No data yet'}</div>
+        <div class="mini-lost" style="color:${lost&&parseFloat(lost)>0?'#059669':'#b48ec0'}">
+          ${lost?(parseFloat(lost)>0?'▼ −'+lost+' kg 🎉':'▲ +'+Math.abs(lost)+' kg'):'Log first entry! 📝'}
+        </div>
+      </div>`;
+    div.onclick=()=>{selectedMember=m.name;renderAll();setTimeout(()=>document.getElementById('profileCard').scrollIntoView({behavior:'smooth'}),100);};
+    c.appendChild(div);
+  });
+}
+
+function renderProfile(name){
+  const m=MEMBERS.find(x=>x.name===name);
+  const entries=allData[name]||{};
+  const wks=sortedWeeks(entries);
+  document.getElementById('profileName').textContent=name;
+  document.getElementById('profileDetailWrap').innerHTML=`
+    <div class="profile-detail">
+      <div class="pd-avatar">${m.svgFn()}</div>
+      <div class="pd-name">${name}</div>
+      <div class="pd-sub">${m.gender==='male'?'♂ Male':'♀ Female'} · ${wks.length} week${wks.length!==1?'s':''} logged</div>
+    </div>`;
+  if(!wks.length){
+    document.getElementById('profileStats').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-weight:700">No entries yet! Go to 📝 Log Entry 🌸</div>`;
+    document.getElementById('profileCard').style.display='block';
+    document.getElementById('latestCard').style.display='none';
+    return;
+  }
+  const first=entries[wks[0]],latest=entries[wks[wks.length-1]];
+  const lost=(first.weight-latest.weight).toFixed(1);
+  const bmi=latest.height?(latest.weight/Math.pow(latest.height/100,2)).toFixed(1):'—';
+  document.getElementById('profileStats').innerHTML=`
+    <div class="stat-box"><div class="val" style="color:var(--pink)">${latest.weight} kg</div><div class="lbl">Current</div></div>
+    <div class="stat-box"><div class="val">${first.weight} kg</div><div class="lbl">Starting</div></div>
+    <div class="stat-box"><div class="val" style="color:${parseFloat(lost)>0?'#059669':'#e11d48'}">${parseFloat(lost)>0?'−':''}${lost} kg</div><div class="lbl">Total Lost</div></div>
+    <div class="stat-box"><div class="val" style="color:var(--purple)">${bmi}</div><div class="lbl">BMI</div></div>
+    <div class="stat-box"><div class="val">${wks.length}</div><div class="lbl">Weeks Logged</div></div>
+    <div class="stat-box"><div class="val" style="color:var(--peach)">${latest.calIn||'—'}</div><div class="lbl">Last Cal In</div></div>`;
+  document.getElementById('profileCard').style.display='block';
+  document.getElementById('latestEntry').innerHTML=`
+    <div class="stats-grid">
+      <div class="stat-box"><div class="val">${wks[wks.length-1].replace('_',' ')}</div><div class="lbl">Week</div></div>
+      <div class="stat-box"><div class="val" style="color:var(--pink)">${latest.weight} kg</div><div class="lbl">Weight</div></div>
+      <div class="stat-box"><div class="val" style="color:var(--peach)">${latest.calIn||'—'}</div><div class="lbl">Cal Intake</div></div>
+      <div class="stat-box"><div class="val" style="color:var(--mint)">${latest.calBurn||'—'}</div><div class="lbl">Cal Burned</div></div>
+      ${latest.note?`<div class="stat-box" style="grid-column:1/-1"><div class="val" style="font-size:.9rem;color:var(--muted)">"${latest.note}"</div><div class="lbl">Note</div></div>`:''}
+    </div>`;
+  document.getElementById('latestCard').style.display='block';
+}
+
+function onNameChange(){prefillHeight();renderAllEntriesTable();}
+function prefillHeight(){
+  const name=document.getElementById('logName').value;if(!name)return;
+  const entries=allData[name]||{};const wks=sortedWeeks(entries);
+  if(wks.length){const last=entries[wks[wks.length-1]];if(last.height)document.getElementById('logHeight').value=last.height;}
+}
+
+// ── SAVE ENTRY ──
+function saveEntry(){
+  const name   =document.getElementById('logName').value;
+  const week   =document.getElementById('logWeek').value;
+  const weight =parseFloat(document.getElementById('logWeight').value);
+  const height =parseFloat(document.getElementById('logHeight').value);
+  const calIn  =parseInt(document.getElementById('logCalIn').value)||0;
+  const calBurn=parseInt(document.getElementById('logCalBurn').value)||0;
+  const note   =document.getElementById('logNote').value.trim();
+
+  if(!name)                      return showToast('🌸 Please select your name!','error');
+  if(!weight||weight<30||weight>300) return showToast('⚖️ Enter a valid weight (30–300 kg)!','error');
+
+  const existing=allData[name]||{};
+  const wks=sortedWeeks(existing);
+  let finalH=height;
+  if(!finalH&&wks.length) finalH=existing[wks[wks.length-1]].height||0;
+
+  const entry={weight,height:finalH||0,calIn,calBurn,note,ts:Date.now()};
+  const weekKey=week.replace(' ','_');
+
+  // Save locally first — instant, always works
+  if(!allData[name]) allData[name]={};
+  allData[name][weekKey]=entry;
+  saveLocal(allData);
+  renderAll();
+
+  // Then sync to Firebase
+  if(firebaseReady&&dataRef){
+    const btn=document.getElementById('saveBtn');
+    btn.disabled=true; btn.innerHTML='⏳ Syncing to cloud…';
+    dataRef.child(name).child(weekKey).set(entry)
+      .then(()=>{
+        showToast(`✅ ${name}'s ${week} saved & synced! 🌸`);
+        btn.disabled=false; btn.innerHTML='💾 Save Entry';
+        document.getElementById('logWeight').value='';
+        document.getElementById('logNote').value='';
+      })
+      .catch(err=>{
+        showToast(`⚠️ Saved locally! Cloud error: ${err.message}`,'warning');
+        btn.disabled=false; btn.innerHTML='💾 Save Entry';
+        document.getElementById('logWeight').value='';
+        document.getElementById('logNote').value='';
+      });
+  } else {
+    showToast(`💾 Saved locally! (Firebase not connected)`,'warning');
+    document.getElementById('logWeight').value='';
+    document.getElementById('logNote').value='';
+  }
+}
+
+function renderAllEntriesTable(){
+  const name=document.getElementById('logName').value;
+  document.getElementById('allEntriesName').textContent=name||'Select a name above';
+  const tbody=document.getElementById('allEntriesTbody');tbody.innerHTML='';
+  if(!name)return;
+  const entries=allData[name]||{};const wks=sortedWeeks(entries);
+  if(!wks.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">No entries yet 🌸</td></tr>';return;}
+  wks.forEach(wk=>{
+    const e=entries[wk];
+    const bmi=e.height?(e.weight/Math.pow(e.height/100,2)).toFixed(1):'—';
+    const net=(e.calIn||0)-(e.calBurn||0);
+    tbody.innerHTML+=`<tr>
+      <td>${wk.replace('_',' ')}</td><td>${e.weight} kg</td><td>${bmi}</td>
+      <td>${e.calIn||'—'} kcal</td><td>${e.calBurn||'—'} kcal</td>
+      <td style="color:${net>0?'#e11d48':'#059669'};font-weight:800">${net>0?'+':''}${net}</td>
+      <td>${e.note||'—'}</td>
+    </tr>`;
+  });
+}
+
+function renderCharts(){renderMemberToggles();renderMainChart();renderCalWeekChart();}
+function renderMemberToggles(){
+  const c=document.getElementById('memberToggles');c.innerHTML='';
+  MEMBERS.forEach(m=>{
+    const on=visibleMembers[m.name];
+    const btn=document.createElement('button');btn.className='toggle-btn';
+    btn.textContent=`${m.gender==='male'?'👨':'👩'} ${m.name}`;
+    btn.style.cssText=`border-color:${m.color};color:${on?'#fff':m.color};background:${on?m.color:'transparent'}`;
+    btn.onclick=()=>{visibleMembers[m.name]=!visibleMembers[m.name];renderCharts();};
+    c.appendChild(btn);
+  });
+}
+function getDatasets(){
+  return MEMBERS.filter(m=>visibleMembers[m.name]).map(m=>{
+    const entries=allData[m.name]||{};
+    const data=WEEKS.map(w=>{
+      const e=entries[w.replace(' ','_')];if(!e)return null;
+      if(chartMode==='weight')  return e.weight;
+      if(chartMode==='bmi')     return e.height?+(e.weight/Math.pow(e.height/100,2)).toFixed(1):null;
+      if(chartMode==='calIn')   return e.calIn||null;
+      if(chartMode==='calBurn') return e.calBurn||null;
+      if(chartMode==='net')     return((e.calIn||0)-(e.calBurn||0))||null;
+      if(chartMode==='lost'){const wk2=sortedWeeks(entries);const f=wk2.length?entries[wk2[0]].weight:null;return f&&e.weight?+(f-e.weight).toFixed(1):null;}
+      return null;
+    });
+    return{label:m.name,data,borderColor:m.color,backgroundColor:m.color+'22',tension:.4,pointRadius:6,pointHoverRadius:9,fill:false,spanGaps:true,pointBackgroundColor:m.color,borderWidth:3};
+  });
+}
+const cOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5b3a6b',font:{family:'Nunito',weight:'700'}}},tooltip:{mode:'index',intersect:false}},scales:{x:{ticks:{color:'#b48ec0',font:{family:'Nunito',weight:'700'}},grid:{color:'#f0d6f5'}},y:{ticks:{color:'#b48ec0',font:{family:'Nunito',weight:'700'}},grid:{color:'#f0d6f5'}}}};
+function renderMainChart(){
+  const ctx=document.getElementById('mainChart').getContext('2d');
+  if(mainChartInst)mainChartInst.destroy();
+  mainChartInst=new Chart(ctx,{type:'line',data:{labels:WEEKS,datasets:getDatasets()},options:cOpts});
+}
+function setChartMode(m){chartMode=m;renderMainChart();}
+function renderCalWeekChart(){
+  const week=document.getElementById('calWeekSel').value;
+  const key=week.replace(' ','_');
+  const labels=[],iD=[],bD=[];
+  MEMBERS.forEach(m=>{const e=(allData[m.name]||{})[key];labels.push(m.name);iD.push(e?(e.calIn||0):0);bD.push(e?(e.calBurn||0):0);});
+  const ctx=document.getElementById('calWeekChart').getContext('2d');
+  if(calWeekInst)calWeekInst.destroy();
+  calWeekInst=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'🍽️ Cal Intake',data:iD,backgroundColor:'#ff6eb488',borderColor:'#ff6eb4',borderWidth:2,borderRadius:8},{label:'🏃 Cal Burned',data:bD,backgroundColor:'#6ee7b788',borderColor:'#6ee7b7',borderWidth:2,borderRadius:8}]},options:cOpts});
+}
+
+function renderSnapshots(){
+  const c=document.getElementById('snapshotGrid');c.innerHTML='';
+  MEMBERS.forEach(m=>{
+    const entries=allData[m.name]||{};const wks=sortedWeeks(entries);
+    const first=wks.length?entries[wks[0]]:null;const latest=wks.length?entries[wks[wks.length-1]]:null;
+    const lost=first&&latest?(first.weight-latest.weight).toFixed(1):null;
+    const bmi=latest&&latest.height?(latest.weight/Math.pow(latest.height/100,2)).toFixed(1):'—';
+    const bmiCat=bmi!=='—'?getBmiCat(parseFloat(bmi)):{label:'—',color:'#b48ec0'};
+    c.innerHTML+=`<div class="snap-card">
+      <div class="snap-avatar">${m.svgFn()}</div>
+      <div class="sname">${m.name}</div>
+      ${latest?`<div class="sval" style="color:var(--pink)">${latest.weight} kg</div><div class="slbl">Current</div>
+        <div class="sval ${parseFloat(lost)>0?'loss':'gain'}" style="margin-top:10px">${parseFloat(lost)>0?'▼ ':'▲ '}${Math.abs(lost)} kg</div>
+        <div class="slbl">vs Week 1</div>
+        <div class="sbadge" style="background:${bmiCat.color}22;color:${bmiCat.color}">BMI ${bmi} — ${bmiCat.label}</div>`
+      :'<div class="slbl" style="margin-top:18px">No data yet 🌸</div>'}
+    </div>`;
+  });
+}
+
+function renderLeaderboard(){
+  const scores=MEMBERS.map(m=>{
+    const entries=allData[m.name]||{};const wks=sortedWeeks(entries);
+    const first=wks.length?entries[wks[0]]:null;const latest=wks.length?entries[wks[wks.length-1]]:null;
+    return{...m,lost:first&&latest?+(first.weight-latest.weight).toFixed(2):0};
+  }).sort((a,b)=>b.lost-a.lost);
+  const medals=['🥇','🥈','🥉','4️⃣','5️⃣'];
+  document.getElementById('lbList').innerHTML=scores.map((s,i)=>`
+    <div class="lb-item">
+      <div class="lb-rank">${medals[i]}</div>
+      <div class="lb-avatar">${s.svgFn()}</div>
+      <div class="lb-name">${s.name}<br><span style="font-size:.75rem;color:var(--muted)">${s.gender==='male'?'♂ Male':'♀ Female'}</span></div>
+      <div class="lb-lost">${s.lost>0?'−'+s.lost+' kg 🎉':'No data yet'}</div>
+    </div>`).join('');
+}
+
+function renderSummary(){
+  const tbody=document.getElementById('summaryTbody');tbody.innerHTML='';
+  MEMBERS.forEach(m=>{
+    const entries=allData[m.name]||{};const wks=sortedWeeks(entries);
+    if(!wks.length){tbody.innerHTML+=`<tr><td><strong>${m.name}</strong></td><td colspan="6" style="color:var(--muted)">No data yet 🌸</td></tr>`;return;}
+    const first=entries[wks[0]];const latest=entries[wks[wks.length-1]];
+    const lost=(first.weight-latest.weight).toFixed(1);
+    const bmi=latest.height?(latest.weight/Math.pow(latest.height/100,2)).toFixed(1):'—';
+    tbody.innerHTML+=`<tr>
+      <td><strong>${m.name}</strong></td><td>${wks[wks.length-1].replace('_',' ')}</td>
+      <td>${latest.weight} kg</td><td>${bmi}</td>
+      <td style="color:${parseFloat(lost)>0?'#059669':'#e11d48'};font-weight:800">${parseFloat(lost)>0?'−':''}${lost} kg</td>
+      <td>${latest.calIn||'—'}</td><td>${latest.calBurn||'—'}</td>
+    </tr>`;
+  });
+}
+
+function calcCalories(){
+  const g=document.getElementById('cGender').value;
+  const age=+document.getElementById('cAge').value;
+  const w=+document.getElementById('cWeight').value;
+  const h=+document.getElementById('cHeight').value;
+  const act=+document.getElementById('cActivity').value;
+  if(!age||!w||!h)return showToast('🌸 Please fill all fields!','error');
+  const bmr=g==='male'?13.397*w+4.799*h-5.677*age+88.362:9.247*w+3.098*h-4.330*age+447.593;
+  const tdee=bmr*act,goal=tdee-500,bmi=w/Math.pow(h/100,2),cat=getBmiCat(bmi);
+  document.getElementById('calcOutput').innerHTML=`
+    <div class="stats-grid">
+      <div class="stat-box"><div class="val" style="color:${cat.color}">${bmi.toFixed(1)}</div><div class="lbl">BMI</div></div>
+      <div class="stat-box"><div class="val">${Math.round(bmr)}</div><div class="lbl">BMR</div></div>
+      <div class="stat-box"><div class="val" style="color:var(--purple)">${Math.round(tdee)}</div><div class="lbl">TDEE</div></div>
+      <div class="stat-box"><div class="val" style="color:#059669">${Math.round(goal)}</div><div class="lbl">🎯 Goal</div></div>
+    </div>
+    <div style="margin-top:14px;padding:12px 16px;background:${cat.color}18;border-radius:12px;border-left:4px solid ${cat.color}">
+      <strong style="color:${cat.color}">BMI Category: ${cat.label}</strong>
+    </div>
+    <p style="color:var(--muted);font-size:.84rem;font-weight:700;margin-top:10px">💡 Eat ~${Math.round(goal)} kcal/day to lose ~0.5 kg/week 🎯</p>`;
+  document.getElementById('calcResult').style.display='block';
+}
+
+const TIPS=[
+  ["🥛 Drink Water First","Start every meal with a glass of water. Reduces hunger and boosts metabolism!"],
+  ["🥗 Eat Protein at Breakfast","Protein keeps you full. Try eggs, yogurt, or a protein shake."],
+  ["🚶 Walk 10,000 Steps","Burns 300–500 kcal daily. Consistency beats intensity!"],
+  ["😴 Sleep 7–9 Hours","Poor sleep increases hunger hormones. Sleep is crucial!"],
+  ["🍽️ Use Smaller Plates","Tricks your brain into feeling full with less food."],
+  ["🥦 Fill Half Plate w/Veg","Low-calorie, high-fibre — keeps you full!"],
+  ["📱 Track What You Eat","People who log food lose 2× more weight!"],
+  ["🧘 Manage Stress","Cortisol causes belly fat. Try yoga or deep breathing."],
+  ["🚫 Limit Sugary Drinks","One soda = ~150 empty kcal. Switch to water or tea."],
+  ["⏰ Intermittent Fasting","16:8 fasting reduces calories without counting every meal."],
+  ["💪 Strength Training","Muscle burns more calories at rest. 2×/week minimum!"],
+  ["🎯 Set Weekly Mini-Goals","Small weekly targets keep you motivated! 🌸"]
+];
+function renderTips(){
+  document.getElementById('tipsGrid').innerHTML=TIPS.map((t,i)=>`
+    <div class="tip-card"><div class="tip-num">✨ TIP ${i+1}</div><strong>${t[0]}</strong><p>${t[1]}</p></div>`).join('');
+}
+
+function exportCSV(){
+  let csv='Name,Week,Weight(kg),Height(cm),BMI,CalIntake,CalBurned,Net,Note\n';
+  MEMBERS.forEach(m=>{
+    const entries=allData[m.name]||{};
+    sortedWeeks(entries).forEach(wk=>{
+      const e=entries[wk];const bmi=e.height?(e.weight/Math.pow(e.height/100,2)).toFixed(1):'';
+      csv+=`${m.name},${wk.replace('_',' ')},${e.weight},${e.height||''},${bmi},${e.calIn||''},${e.calBurn||''},${(e.calIn||0)-(e.calBurn||0)},"${e.note||''}"\n`;
+    });
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='MissionSlimpossible2026.csv';a.click();
+  showToast('📥 CSV exported!');
+}
+
+function resetAll(){
+  if(!confirm('⚠️ Delete ALL data for ALL members? Cannot be undone!'))return;
+  allData={};saveLocal({});
+  if(firebaseReady&&dataRef)dataRef.remove().catch(()=>{});
+  renderAll();showToast('🗑️ All data cleared!');
+}
+
+function showSection(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(id==='charts')renderCharts();
+}
+
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(type==='error'?' error':type==='warning'?' warning':'')+' show';
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+init();
+</script>
+</body>
+</html>
+
+							<script>
+                            	databaseURL: "https://mission-slimpossible-2026-default-rtdb
+                .asia-southeast1.firebasedatabase.app"
+							</script>
+                        </body>
+                        </html>
+                    
