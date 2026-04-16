@@ -1,19 +1,4 @@
-
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-							<style>
-								body {
-									background-color: white; /* Ensure the iframe has a white background */
-								}
-
-								
-							</style>
-                        </head>
-                        <body>
-                            <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -107,6 +92,47 @@ td{padding:10px 14px;border-bottom:1.5px solid var(--border);white-space:nowrap;
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#fdf4ff;}
 
+/* ── EDIT / DELETE BUTTONS in table ── */
+.row-actions{display:flex;gap:6px;align-items:center;}
+.btn-edit{
+  display:inline-flex;align-items:center;gap:4px;
+  background:linear-gradient(135deg,#e0f2fe,#f0e6ff);
+  color:var(--purple);border:1.5px solid var(--purple2);
+  border-radius:20px;padding:5px 12px;cursor:pointer;
+  font-size:.75rem;font-weight:800;font-family:'Nunito',sans-serif;
+  transition:all .2s;white-space:nowrap;
+}
+.btn-edit:hover{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;border-color:transparent;transform:translateY(-1px);}
+.btn-del{
+  display:inline-flex;align-items:center;gap:4px;
+  background:linear-gradient(135deg,#fff0f0,#ffe0e0);
+  color:#e11d48;border:1.5px solid #fecdd3;
+  border-radius:20px;padding:5px 12px;cursor:pointer;
+  font-size:.75rem;font-weight:800;font-family:'Nunito',sans-serif;
+  transition:all .2s;white-space:nowrap;
+}
+.btn-del:hover{background:linear-gradient(135deg,#fb7185,#f43f5e);color:#fff;border-color:transparent;transform:translateY(-1px);}
+
+/* ── EDIT MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:8888;
+  background:rgba(91,58,107,.45);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:16px;
+}
+.modal-overlay.show{display:flex;}
+.modal-box{
+  background:#fff;border-radius:28px;padding:28px;
+  width:100%;max-width:540px;
+  border:2px solid var(--border);
+  box-shadow:0 20px 60px rgba(192,132,252,.3);
+  position:relative;animation:popIn .25s ease;
+}
+@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--sky));border-radius:4px 4px 0 0;}
+.modal-title{color:var(--purple);font-size:1.1rem;font-weight:900;margin-bottom:18px;}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--border);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.modal-close:hover{background:var(--pink);color:#fff;}
+
 .lb-item{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#fdf4ff,#fce7f3);border:2px solid var(--border);border-radius:18px;padding:14px 20px;margin-bottom:12px;transition:transform .2s;}
 .lb-item:hover{transform:translateX(5px);}
 .lb-item:first-child{background:linear-gradient(135deg,#fff7d6,#fce7f3);border-color:#fbbf24;box-shadow:0 4px 16px rgba(251,191,36,.2);}
@@ -175,7 +201,7 @@ tr:hover td{background:#fdf4ff;}
 .sticker{display:inline-block;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-radius:20px;padding:4px 14px;font-size:.74rem;font-weight:800;margin-left:8px;vertical-align:middle;}
 .info-tip{background:linear-gradient(135deg,#e0f2fe,#f3e8ff);border-left:4px solid var(--purple);border-radius:12px;padding:10px 14px;font-size:.82rem;color:var(--muted);font-weight:700;margin-top:14px;}
 
-@media(max-width:600px){.form-grid{grid-template-columns:1fr;}.btn-row{flex-direction:column;}header{border-radius:0 0 28px 28px;}}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}.btn-row{flex-direction:column;}header{border-radius:0 0 28px 28px;}.modal-box{padding:20px;}}
 </style>
 </head>
 <body>
@@ -206,6 +232,25 @@ tr:hover td{background:#fdf4ff;}
 </nav>
 
 <div class="toast" id="toast"></div>
+
+<!-- ═══ EDIT MODAL ═══ -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">✏️ Edit Entry — <span id="modalTitle"></span></div>
+    <div class="form-grid">
+      <div><label>⚖️ Weight (kg)</label><input type="number" id="editWeight" step="0.1" min="30" max="300"/></div>
+      <div><label>📏 Height (cm)</label><input type="number" id="editHeight" step="0.1" min="100" max="250"/></div>
+      <div><label>🍽️ Cal Intake (kcal)</label><input type="number" id="editCalIn" min="0"/></div>
+      <div><label>🏃 Cal Burned (kcal)</label><input type="number" id="editCalBurn" min="0"/></div>
+      <div style="grid-column:1/-1"><label>📝 Note</label><textarea id="editNote" rows="2"></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="saveEdit()">💾 Save Changes</button>
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="section active">
@@ -256,13 +301,11 @@ tr:hover td{background:#fdf4ff;}
 <div id="log" class="section">
   <div class="card">
     <h2>📝 Log Weekly Entry</h2>
-    <div id="offlineBanner">⚠️ <strong>Not connected to Firebase.</strong> Entry saved locally on this device only. Check your internet connection or Firebase setup.</div>
+    <div id="offlineBanner">⚠️ <strong>Not connected to Firebase.</strong> Entry saved locally on this device only.</div>
     <p style="color:var(--muted);font-size:.85rem;font-weight:700;margin-bottom:18px">Select your name, choose the week, then fill in your data ✍️</p>
     <div class="form-grid">
       <div><label>👤 Your Name</label>
-        <select id="logName" onchange="onNameChange()">
-          <option value="">— Select your name —</option>
-        </select>
+        <select id="logName" onchange="onNameChange()"><option value="">— Select your name —</option></select>
       </div>
       <div><label>📅 Week</label><select id="logWeek"></select></div>
       <div><label>⚖️ Weight (kg)</label><input type="number" id="logWeight" placeholder="e.g. 72.5" step="0.1" min="30" max="300"/></div>
@@ -278,11 +321,18 @@ tr:hover td{background:#fdf4ff;}
     </div>
     <div class="info-tip">ℹ️ Same week entry overwrites previous. Height auto-fills from last entry.</div>
   </div>
+
   <div class="card">
     <h2>📋 All Entries — <span id="allEntriesName" style="color:var(--pink)">Select a name above</span></h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>📅 Week</th><th>⚖️ Weight</th><th>📉 BMI</th><th>🍽️ Cal In</th><th>🏃 Cal Burned</th><th>⚡ Net</th><th>📝 Note</th></tr></thead>
+        <thead>
+          <tr>
+            <th>📅 Week</th><th>⚖️ Weight</th><th>📉 BMI</th>
+            <th>🍽️ Cal In</th><th>🏃 Cal Burned</th><th>⚡ Net</th>
+            <th>📝 Note</th><th>⚙️ Actions</th>
+          </tr>
+        </thead>
         <tbody id="allEntriesTbody"></tbody>
       </table>
     </div>
@@ -389,9 +439,9 @@ tr:hover td{background:#fdf4ff;}
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════
-//  ✅ YOUR FIREBASE CONFIG — ALREADY SET UP!
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════
+//  ✅ FIREBASE CONFIG
+// ═══════════════════════════════════════
 const firebaseConfig = {
   apiKey:            "AIzaSyBnT0_Bojdp3dq2vV7hGPKPf18w2pzNrwQ",
   authDomain:        "mission-slimpossible-2026.firebaseapp.com",
@@ -401,22 +451,19 @@ const firebaseConfig = {
   messagingSenderId: "894052895127",
   appId:             "1:894052895127:web:e06572b0d04967fe335cd2"
 };
-// ═══════════════════════════════════════════════════
 
-let db = null, dataRef = null, firebaseReady = false;
-const LS_KEY = 'slimpossible2026_data';
+let db=null, dataRef=null, firebaseReady=false;
+const LS_KEY='slimpossible2026_data';
 
-try {
+try{
   firebase.initializeApp(firebaseConfig);
-  db = firebase.database();
-  dataRef = db.ref('missionSlimpossible2026');
-  firebaseReady = true;
-} catch(e) {
-  console.warn('Firebase init error:', e);
-}
+  db=firebase.database();
+  dataRef=db.ref('missionSlimpossible2026');
+  firebaseReady=true;
+}catch(e){console.warn('Firebase error:',e);}
 
 // ── SVG AVATARS ──
-function svgMale(skin, shirt, hair) {
+function svgMale(skin,shirt,hair){
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="50" cy="95" rx="22" ry="5" fill="rgba(0,0,0,0.07)"/>
     <rect x="28" y="62" width="44" height="30" rx="14" fill="${shirt}"/>
@@ -441,7 +488,7 @@ function svgMale(skin, shirt, hair) {
     <path d="M38 64 L50 72 L62 64" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`;
 }
-function svgFemaleHijab(skin, outfit, hijab) {
+function svgFemaleHijab(skin,outfit,hijab){
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="50" cy="95" rx="22" ry="5" fill="rgba(0,0,0,0.07)"/>
     <rect x="26" y="62" width="48" height="30" rx="14" fill="${outfit}"/>
@@ -466,18 +513,17 @@ function svgFemaleHijab(skin, outfit, hijab) {
   </svg>`;
 }
 
-// ── MEMBERS ──
-const MEMBERS = [
-  { name:"Shahrul", gender:"male",   color:"#7dd3fc", svgFn:()=>svgMale("#f5c5a3","#7dd3fc","#3b2000") },
-  { name:"Najib",   gender:"male",   color:"#6ee7b7", svgFn:()=>svgMale("#e8b89a","#6ee7b7","#1a0a00") },
-  { name:"Aiman",   gender:"male",   color:"#a78bfa", svgFn:()=>svgMale("#fcd9b6","#a78bfa","#5b3a00") },
-  { name:"Su",      gender:"female", color:"#ff6eb4", svgFn:()=>svgFemaleHijab("#f5c5a3","#ff6eb4","#6b2d6b") },
-  { name:"Lena",    gender:"female", color:"#fbbf24", svgFn:()=>svgFemaleHijab("#fcd9b6","#fbbf24","#7c3a00") }
+const MEMBERS=[
+  {name:"Shahrul",gender:"male",  color:"#7dd3fc",svgFn:()=>svgMale("#f5c5a3","#7dd3fc","#3b2000")},
+  {name:"Najib",  gender:"male",  color:"#6ee7b7",svgFn:()=>svgMale("#e8b89a","#6ee7b7","#1a0a00")},
+  {name:"Aiman",  gender:"male",  color:"#a78bfa",svgFn:()=>svgMale("#fcd9b6","#a78bfa","#5b3a00")},
+  {name:"Su",     gender:"female",color:"#ff6eb4",svgFn:()=>svgFemaleHijab("#f5c5a3","#ff6eb4","#6b2d6b")},
+  {name:"Lena",   gender:"female",color:"#fbbf24",svgFn:()=>svgFemaleHijab("#fcd9b6","#fbbf24","#7c3a00")}
 ];
-const WEEKS      = Array.from({length:13},(_,i)=>`Week ${i+1}`);
-const END_DATE   = new Date('2026-07-27T23:59:59');
-const START_DATE = new Date('2026-04-27T00:00:00');
-const QUOTES = [
+const WEEKS=Array.from({length:13},(_,i)=>`Week ${i+1}`);
+const END_DATE=new Date('2026-07-27T23:59:59');
+const START_DATE=new Date('2026-04-27T00:00:00');
+const QUOTES=[
   {text:"Every step forward is a step away from where you used to be.",author:"— Daily Motivation 🌸"},
   {text:"You didn't come this far to only come this far. Keep going!",author:"— Mission Slimpossible 💪"},
   {text:"Your body can do it. It's time to convince your mind.",author:"— Fitness Wisdom 🧠"},
@@ -487,38 +533,34 @@ const QUOTES = [
   {text:"Don't wish for a good body. Work for it!",author:"— Gym Life 💪"}
 ];
 
-let allData={}, selectedMember=null, chartMode='weight';
-let mainChartInst=null, calWeekInst=null, visibleMembers={};
-let isOnline=false;
+let allData={},selectedMember=null,chartMode='weight';
+let mainChartInst=null,calWeekInst=null,visibleMembers={};
 
-function loadLocal(){try{return JSON.parse(localStorage.getItem(LS_KEY))||{};}catch(e){return {};}}
+// Modal state
+let editingName='', editingWeekKey='';
+
+function loadLocal(){try{return JSON.parse(localStorage.getItem(LS_KEY))||{};}catch(e){return{};}}
 function saveLocal(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
-function setSyncBar(state,msg){document.getElementById('syncBar').className=state;document.getElementById('syncMsg').textContent=msg;}
+function setSyncBar(s,m){document.getElementById('syncBar').className=s;document.getElementById('syncMsg').textContent=m;}
 
-// ── FIREBASE LISTENERS ──
-if(firebaseReady && dataRef){
-  dataRef.on('value', snap=>{
-    isOnline=true;
+// ── FIREBASE ──
+if(firebaseReady&&dataRef){
+  dataRef.on('value',snap=>{
     allData=snap.val()||{};
     saveLocal(allData);
     setSyncBar('online','🟢 Live — synced across all devices! 🌸');
     document.getElementById('offlineBanner').classList.remove('show');
     renderAll();
-  }, ()=>{
-    isOnline=false;
+  },()=>{
     allData=loadLocal();
     setSyncBar('offline','🟠 Offline — using local data');
     document.getElementById('offlineBanner').classList.add('show');
     renderAll();
   });
-  db.ref('.info/connected').on('value', snap=>{
-    isOnline=!!snap.val();
-    if(!isOnline){
-      setSyncBar('offline','🟠 Offline — will sync when reconnected');
-      document.getElementById('offlineBanner').classList.add('show');
-    }
+  db.ref('.info/connected').on('value',snap=>{
+    if(!snap.val()){setSyncBar('offline','🟠 Offline — will sync when reconnected');document.getElementById('offlineBanner').classList.add('show');}
   });
-} else {
+}else{
   allData=loadLocal();
   setSyncBar('error','⚠️ Firebase error — local only');
   document.getElementById('offlineBanner').classList.add('show');
@@ -529,9 +571,9 @@ if(firebaseReady && dataRef){
 function weekNum(w){return parseInt(String(w).replace(/Week /,'').replace(/_/g,' '))||0;}
 function sortedWeeks(e){return Object.keys(e).sort((a,b)=>weekNum(a)-weekNum(b));}
 function getBmiCat(b){
-  if(b<18.5) return{label:'Underweight',color:'#7dd3fc'};
-  if(b<25)   return{label:'Healthy ✅',color:'#34d399'};
-  if(b<30)   return{label:'Overweight ⚠️',color:'#fb923c'};
+  if(b<18.5)return{label:'Underweight',color:'#7dd3fc'};
+  if(b<25)  return{label:'Healthy ✅',color:'#34d399'};
+  if(b<30)  return{label:'Overweight ⚠️',color:'#fb923c'};
   return{label:'Obese ❗',color:'#fb7185'};
 }
 
@@ -546,8 +588,8 @@ function init(){
     ln.innerHTML+=`<option value="${m.name}">${m.gender==='male'?'👨':'👩'} ${m.name}</option>`;
     visibleMembers[m.name]=true;
   });
-  renderTips(); renderQuote(); renderMissionProgress(); startCountdown();
-  renderProfileBtns(); renderMemberMiniGrid();
+  renderTips();renderQuote();renderMissionProgress();startCountdown();
+  renderProfileBtns();renderMemberMiniGrid();
 }
 
 function startCountdown(){
@@ -559,15 +601,13 @@ function startCountdown(){
     document.getElementById('cd-m').textContent=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
     document.getElementById('cd-s').textContent=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
   }
-  u(); setInterval(u,1000);
+  u();setInterval(u,1000);
 }
-
 function renderQuote(){
   const q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
   document.getElementById('quoteText').textContent=`"${q.text}"`;
   document.getElementById('quoteAuthor').textContent=q.author;
 }
-
 function renderMissionProgress(){
   const now=new Date();
   const total=END_DATE-START_DATE;
@@ -587,11 +627,11 @@ function renderMissionProgress(){
 }
 
 function renderAll(){
-  renderProfileBtns(); renderMemberMiniGrid();
-  if(selectedMember) renderProfile(selectedMember);
+  renderProfileBtns();renderMemberMiniGrid();
+  if(selectedMember)renderProfile(selectedMember);
   renderAllEntriesTable();
-  if(document.getElementById('charts').classList.contains('active')) renderCharts();
-  renderLeaderboard(); renderSummary(); renderSnapshots();
+  if(document.getElementById('charts').classList.contains('active'))renderCharts();
+  renderLeaderboard();renderSummary();renderSnapshots();
 }
 
 function renderProfileBtns(){
@@ -602,15 +642,11 @@ function renderProfileBtns(){
     const latest=wks.length?entries[wks[wks.length-1]]:null;
     const div=document.createElement('div');
     div.className='profile-btn'+(selectedMember===m.name?' selected':'');
-    div.innerHTML=`
-      <div class="avatar-wrap">${m.svgFn()}</div>
+    div.innerHTML=`<div class="avatar-wrap">${m.svgFn()}</div>
       <div class="pname">${m.name}</div>
       <div class="pgender">${m.gender==='male'?'♂ Male':'♀ Female'}</div>
       <div class="pweight">${latest?latest.weight+' kg':'Tap to view 👆'}</div>`;
-    div.onclick=()=>{
-      selectedMember=m.name; renderAll();
-      setTimeout(()=>document.getElementById('profileCard').scrollIntoView({behavior:'smooth',block:'start'}),100);
-    };
+    div.onclick=()=>{selectedMember=m.name;renderAll();setTimeout(()=>document.getElementById('profileCard').scrollIntoView({behavior:'smooth',block:'start'}),100);};
     c.appendChild(div);
   });
 }
@@ -624,8 +660,7 @@ function renderMemberMiniGrid(){
     const latest=wks.length?entries[wks[wks.length-1]]:null;
     const lost=first&&latest?(first.weight-latest.weight).toFixed(1):null;
     const div=document.createElement('div');div.className='member-mini';
-    div.innerHTML=`
-      <div class="mini-avatar">${m.svgFn()}</div>
+    div.innerHTML=`<div class="mini-avatar">${m.svgFn()}</div>
       <div class="mini-info">
         <div class="mini-name">${m.name}</div>
         <div class="mini-weight">${latest?latest.weight+' kg':'No data yet'}</div>
@@ -693,68 +728,138 @@ function saveEntry(){
   const calIn  =parseInt(document.getElementById('logCalIn').value)||0;
   const calBurn=parseInt(document.getElementById('logCalBurn').value)||0;
   const note   =document.getElementById('logNote').value.trim();
-
-  if(!name)                      return showToast('🌸 Please select your name!','error');
-  if(!weight||weight<30||weight>300) return showToast('⚖️ Enter a valid weight (30–300 kg)!','error');
-
+  if(!name)return showToast('🌸 Please select your name!','error');
+  if(!weight||weight<30||weight>300)return showToast('⚖️ Enter a valid weight (30–300 kg)!','error');
   const existing=allData[name]||{};
   const wks=sortedWeeks(existing);
   let finalH=height;
-  if(!finalH&&wks.length) finalH=existing[wks[wks.length-1]].height||0;
-
+  if(!finalH&&wks.length)finalH=existing[wks[wks.length-1]].height||0;
   const entry={weight,height:finalH||0,calIn,calBurn,note,ts:Date.now()};
   const weekKey=week.replace(' ','_');
-
-  // Save locally first — instant, always works
-  if(!allData[name]) allData[name]={};
+  if(!allData[name])allData[name]={};
   allData[name][weekKey]=entry;
-  saveLocal(allData);
-  renderAll();
-
-  // Then sync to Firebase
+  saveLocal(allData);renderAll();
   if(firebaseReady&&dataRef){
     const btn=document.getElementById('saveBtn');
-    btn.disabled=true; btn.innerHTML='⏳ Syncing to cloud…';
+    btn.disabled=true;btn.innerHTML='⏳ Syncing…';
     dataRef.child(name).child(weekKey).set(entry)
-      .then(()=>{
-        showToast(`✅ ${name}'s ${week} saved & synced! 🌸`);
-        btn.disabled=false; btn.innerHTML='💾 Save Entry';
-        document.getElementById('logWeight').value='';
-        document.getElementById('logNote').value='';
-      })
-      .catch(err=>{
-        showToast(`⚠️ Saved locally! Cloud error: ${err.message}`,'warning');
-        btn.disabled=false; btn.innerHTML='💾 Save Entry';
-        document.getElementById('logWeight').value='';
-        document.getElementById('logNote').value='';
-      });
-  } else {
-    showToast(`💾 Saved locally! (Firebase not connected)`,'warning');
-    document.getElementById('logWeight').value='';
-    document.getElementById('logNote').value='';
+      .then(()=>{showToast(`✅ ${name}'s ${week} saved & synced! 🌸`);btn.disabled=false;btn.innerHTML='💾 Save Entry';document.getElementById('logWeight').value='';document.getElementById('logNote').value='';})
+      .catch(err=>{showToast(`⚠️ Saved locally! Cloud error: ${err.message}`,'warning');btn.disabled=false;btn.innerHTML='💾 Save Entry';document.getElementById('logWeight').value='';document.getElementById('logNote').value='';});
+  }else{
+    showToast('💾 Saved locally!','warning');
+    document.getElementById('logWeight').value='';document.getElementById('logNote').value='';
   }
 }
 
+// ══════════════════════════════════════
+//  ✏️ EDIT ENTRY
+// ══════════════════════════════════════
+function openEdit(name, weekKey){
+  const entry=(allData[name]||{})[weekKey];
+  if(!entry)return;
+  editingName=name;
+  editingWeekKey=weekKey;
+  document.getElementById('modalTitle').textContent=`${name} — ${weekKey.replace('_',' ')}`;
+  document.getElementById('editWeight').value=entry.weight||'';
+  document.getElementById('editHeight').value=entry.height||'';
+  document.getElementById('editCalIn').value=entry.calIn||'';
+  document.getElementById('editCalBurn').value=entry.calBurn||'';
+  document.getElementById('editNote').value=entry.note||'';
+  document.getElementById('editModal').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('editModal').classList.remove('show');
+  editingName='';editingWeekKey='';
+}
+
+function saveEdit(){
+  if(!editingName||!editingWeekKey)return;
+  const weight=parseFloat(document.getElementById('editWeight').value);
+  const height=parseFloat(document.getElementById('editHeight').value)||0;
+  const calIn=parseInt(document.getElementById('editCalIn').value)||0;
+  const calBurn=parseInt(document.getElementById('editCalBurn').value)||0;
+  const note=document.getElementById('editNote').value.trim();
+  if(!weight||weight<30||weight>300)return showToast('⚖️ Enter a valid weight!','error');
+
+  const existing=(allData[editingName]||{})[editingWeekKey]||{};
+  const entry={...existing,weight,height,calIn,calBurn,note,ts:Date.now()};
+
+  if(!allData[editingName])allData[editingName]={};
+  allData[editingName][editingWeekKey]=entry;
+  saveLocal(allData);
+  closeModal();
+  renderAll();
+
+  if(firebaseReady&&dataRef){
+    dataRef.child(editingName).child(editingWeekKey).set(entry)
+      .then(()=>showToast(`✏️ Entry updated & synced! 🌸`))
+      .catch(err=>showToast(`⚠️ Updated locally! Cloud error: ${err.message}`,'warning'));
+  }else{
+    showToast('✏️ Entry updated locally!','warning');
+  }
+}
+
+// ══════════════════════════════════════
+//  🗑️ DELETE ENTRY
+// ══════════════════════════════════════
+function deleteEntry(name, weekKey){
+  const weekLabel=weekKey.replace('_',' ');
+  if(!confirm(`🗑️ Delete ${name}'s ${weekLabel}?\n\nThis cannot be undone!`))return;
+
+  if(allData[name]&&allData[name][weekKey]){
+    delete allData[name][weekKey];
+    // Remove member key if no entries left
+    if(Object.keys(allData[name]).length===0)delete allData[name];
+    saveLocal(allData);
+    renderAll();
+  }
+
+  if(firebaseReady&&dataRef){
+    dataRef.child(name).child(weekKey).remove()
+      .then(()=>showToast(`🗑️ ${name}'s ${weekLabel} deleted! 🌸`))
+      .catch(err=>showToast(`⚠️ Deleted locally! Cloud error: ${err.message}`,'warning'));
+  }else{
+    showToast(`🗑️ ${name}'s ${weekLabel} deleted!`,'warning');
+  }
+}
+
+// ── ALL ENTRIES TABLE (with Edit + Delete buttons) ──
 function renderAllEntriesTable(){
   const name=document.getElementById('logName').value;
   document.getElementById('allEntriesName').textContent=name||'Select a name above';
   const tbody=document.getElementById('allEntriesTbody');tbody.innerHTML='';
   if(!name)return;
-  const entries=allData[name]||{};const wks=sortedWeeks(entries);
-  if(!wks.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">No entries yet 🌸</td></tr>';return;}
+  const entries=allData[name]||{};
+  const wks=sortedWeeks(entries);
+  if(!wks.length){
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">No entries yet 🌸</td></tr>';
+    return;
+  }
   wks.forEach(wk=>{
     const e=entries[wk];
     const bmi=e.height?(e.weight/Math.pow(e.height/100,2)).toFixed(1):'—';
     const net=(e.calIn||0)-(e.calBurn||0);
-    tbody.innerHTML+=`<tr>
-      <td>${wk.replace('_',' ')}</td><td>${e.weight} kg</td><td>${bmi}</td>
-      <td>${e.calIn||'—'} kcal</td><td>${e.calBurn||'—'} kcal</td>
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${wk.replace('_',' ')}</td>
+      <td>${e.weight} kg</td>
+      <td>${bmi}</td>
+      <td>${e.calIn||'—'} kcal</td>
+      <td>${e.calBurn||'—'} kcal</td>
       <td style="color:${net>0?'#e11d48':'#059669'};font-weight:800">${net>0?'+':''}${net}</td>
-      <td>${e.note||'—'}</td>
-    </tr>`;
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis">${e.note||'—'}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-edit" onclick="openEdit('${name}','${wk}')">✏️ Edit</button>
+          <button class="btn-del"  onclick="deleteEntry('${name}','${wk}')">🗑️ Del</button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
   });
 }
 
+// ── CHARTS ──
 function renderCharts(){renderMemberToggles();renderMainChart();renderCalWeekChart();}
 function renderMemberToggles(){
   const c=document.getElementById('memberToggles');c.innerHTML='';
@@ -932,15 +1037,12 @@ function showToast(msg,type='success'){
   setTimeout(()=>t.classList.remove('show'),3500);
 }
 
+// Close modal when clicking outside
+document.getElementById('editModal').addEventListener('click',function(e){
+  if(e.target===this)closeModal();
+});
+
 init();
 </script>
 </body>
 </html>
-
-							<script>
-                            	databaseURL: "https://mission-slimpossible-2026-default-rtdb
-                .asia-southeast1.firebasedatabase.app"
-							</script>
-                        </body>
-                        </html>
-                    
