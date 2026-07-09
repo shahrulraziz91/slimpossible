@@ -98,6 +98,7 @@ tr:hover td{background:#fdf4ff;}
 .lb-name{flex:1;font-weight:800;font-size:1rem;}
 .lb-lost{color:var(--success);font-weight:900;font-size:1.1rem;}
 .lb-avatar{width:48px;height:48px;}.lb-avatar svg{width:100%;height:100%;}
+.lb-pct-badge{display:inline-block;background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#065f46;border:1.5px solid #6ee7b7;border-radius:20px;padding:3px 12px;font-size:.78rem;font-weight:900;font-family:'Nunito',sans-serif;margin-top:4px;}
 .tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
 .tip-card{background:linear-gradient(135deg,#fdf4ff,#e0f2fe);border:2px solid var(--border);border-radius:18px;padding:18px;transition:transform .2s;}
 .tip-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
@@ -227,7 +228,7 @@ tr:hover td{background:#fdf4ff;}
     <div class="member-mini-grid" id="memberMiniGrid"></div>
   </div>
   <div class="card">
-    <h2>📋 Challenge Rules & Info</h2>
+    <h2>📋 Challenge Rules &amp; Info</h2>
     <div class="rules-grid">
       <div class="rule-item"><div class="rule-num">1</div><div class="rule-text">Log your weight <strong>every week</strong> ✅</div></div>
       <div class="rule-item"><div class="rule-num">2</div><div class="rule-text">Record <strong>daily calorie intake</strong> honestly 🍽️</div></div>
@@ -356,7 +357,7 @@ tr:hover td{background:#fdf4ff;}
     <h2>📊 All Members — Latest Stats</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>👤</th><th>📅 Week</th><th>⚖️ Weight</th><th>📉 BMI</th><th>🏃 Lost</th><th>🍽️ Cal In</th><th>🔥 Burned</th></tr></thead>
+        <thead><tr><th>👤</th><th>📅 Week</th><th>⚖️ Weight</th><th>📉 BMI</th><th>🏃 Lost (kg &amp; %)</th><th>🍽️ Cal In</th><th>🔥 Burned</th></tr></thead>
         <tbody id="summaryTbody"></tbody>
       </table>
     </div>
@@ -365,7 +366,7 @@ tr:hover td{background:#fdf4ff;}
 <!-- TIPS -->
 <div id="tips" class="section">
   <div class="card">
-    <h2>💡 Diet & Wellness Tips <span class="sticker">12 Tips 💪</span></h2>
+    <h2>💡 Diet &amp; Wellness Tips <span class="sticker">12 Tips 💪</span></h2>
     <div class="tips-grid" id="tipsGrid"></div>
   </div>
 </div>
@@ -375,7 +376,7 @@ tr:hover td{background:#fdf4ff;}
 
 <script>
 // ═══════════════════════════════════════
-//  ✅ FIREBASE CONFIG
+//  FIREBASE CONFIG
 // ═══════════════════════════════════════
 const firebaseConfig = {
   apiKey:            "AIzaSyBnT0_Bojdp3dq2vV7hGPKPf18w2pzNrwQ",
@@ -455,23 +456,12 @@ const MEMBERS=[
   {name:"Lena",   gender:"female",color:"#fbbf24",svgFn:()=>svgFemaleHijab("#fcd9b6","#fbbf24","#7c3a00")}
 ];
 
-// ══════════════════════════════════════
-//  🔑 KEY HELPERS  ← THE FIX IS HERE
-//  Always use toKey() to store/read,
-//  toLabel() to display.
-// ══════════════════════════════════════
-function toKey(weekLabel){
-  // "Week 1" → "Week_1",  "Week 11" → "Week_11"
-  return weekLabel.replace(/\s+/g,'_');
-}
-function toLabel(weekKey){
-  // "Week_1" → "Week 1",  "Week_11" → "Week 11"
-  return weekKey.replace(/_/g,' ');
-}
+// ── KEY HELPERS ──
+function toKey(weekLabel){ return weekLabel.replace(/\s+/g,'_'); }
+function toLabel(weekKey){ return weekKey.replace(/_/g,' '); }
 
-const WEEKS = Array.from({length:13},(_,i)=>`Week ${i+1}`);
-// Pre-build the key list in correct order
-const WEEK_KEYS = WEEKS.map(toKey); // ["Week_1","Week_2",…,"Week_13"]
+const WEEKS    = Array.from({length:13},(_,i)=>`Week ${i+1}`);
+const WEEK_KEYS= WEEKS.map(toKey);
 
 const END_DATE  = new Date('2026-07-27T23:59:59');
 const START_DATE= new Date('2026-04-27T00:00:00');
@@ -495,11 +485,11 @@ function loadLocal(){try{return JSON.parse(localStorage.getItem(LS_KEY))||{};}ca
 function saveLocal(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
 function setSyncBar(s,m){document.getElementById('syncBar').className=s;document.getElementById('syncMsg').textContent=m;}
 
-// ── SORTED WEEKS (returns keys in Week_1 … Week_13 order) ──
+// ── SORTED WEEKS ──
 function weekNum(k){return parseInt(k.replace(/[^0-9]/g,''))||0;}
 function sortedWeeks(entries){return Object.keys(entries).sort((a,b)=>weekNum(a)-weekNum(b));}
 
-// ── BMI CAT ──
+// ── BMI CATEGORY ──
 function getBmiCat(b){
   if(b<18.5)return{label:'Underweight',color:'#7dd3fc'};
   if(b<25)  return{label:'Healthy ✅',color:'#34d399'};
@@ -507,7 +497,7 @@ function getBmiCat(b){
   return{label:'Obese ❗',color:'#fb7185'};
 }
 
-// ── FIREBASE ──
+// ── FIREBASE LISTENERS ──
 if(firebaseReady&&dataRef){
   dataRef.on('value',snap=>{
     allData=snap.val()||{};
@@ -600,6 +590,7 @@ function renderAll(){
   renderSnapshots();
 }
 
+// ── PROFILE BUTTONS ──
 function renderProfileBtns(){
   const c=document.getElementById('profileBtns');c.innerHTML='';
   MEMBERS.forEach(m=>{
@@ -620,6 +611,7 @@ function renderProfileBtns(){
   });
 }
 
+// ── MEMBER MINI GRID ──
 function renderMemberMiniGrid(){
   const c=document.getElementById('memberMiniGrid');c.innerHTML='';
   MEMBERS.forEach(m=>{
@@ -645,6 +637,7 @@ function renderMemberMiniGrid(){
   });
 }
 
+// ── PROFILE DETAIL ──
 function renderProfile(name){
   const m=MEMBERS.find(x=>x.name===name);
   const entries=allData[name]||{};
@@ -664,12 +657,17 @@ function renderProfile(name){
     return;
   }
   const first=entries[wks[0]], latest=entries[wks[wks.length-1]];
-  const lost=(first.weight-latest.weight).toFixed(1);
+  const lostKg=(first.weight-latest.weight).toFixed(1);
+  const lostPct=first.weight>0?((parseFloat(lostKg)/first.weight)*100).toFixed(1):0;
   const bmi=latest.height?(latest.weight/Math.pow(latest.height/100,2)).toFixed(1):'—';
   document.getElementById('profileStats').innerHTML=`
     <div class="stat-box"><div class="val" style="color:var(--pink)">${latest.weight} kg</div><div class="lbl">Current</div></div>
     <div class="stat-box"><div class="val">${first.weight} kg</div><div class="lbl">Starting</div></div>
-    <div class="stat-box"><div class="val" style="color:${parseFloat(lost)>0?'#059669':'#e11d48'}">${parseFloat(lost)>0?'−':''}${lost} kg</div><div class="lbl">Total Lost</div></div>
+    <div class="stat-box">
+      <div class="val" style="color:${parseFloat(lostKg)>0?'#059669':'#e11d48'}">${parseFloat(lostKg)>0?'−':''}${lostKg} kg</div>
+      ${parseFloat(lostKg)>0?`<div style="font-size:.8rem;font-weight:900;color:#059669;margin-top:2px">(${lostPct}%)</div>`:''}
+      <div class="lbl">Total Lost</div>
+    </div>
     <div class="stat-box"><div class="val" style="color:var(--purple)">${bmi}</div><div class="lbl">BMI</div></div>
     <div class="stat-box"><div class="val">${wks.length}</div><div class="lbl">Weeks Logged</div></div>
     <div class="stat-box"><div class="val" style="color:var(--peach)">${latest.calIn||'—'}</div><div class="lbl">Last Cal In</div></div>`;
@@ -700,27 +698,23 @@ function prefillHeight(){
 // ── SAVE ENTRY ──
 function saveEntry(){
   const name    = document.getElementById('logName').value;
-  const weekKey = document.getElementById('logWeek').value;   // already a key e.g. "Week_11"
+  const weekKey = document.getElementById('logWeek').value;
   const weight  = parseFloat(document.getElementById('logWeight').value);
   const height  = parseFloat(document.getElementById('logHeight').value);
   const calIn   = parseInt(document.getElementById('logCalIn').value)||0;
   const calBurn = parseInt(document.getElementById('logCalBurn').value)||0;
   const note    = document.getElementById('logNote').value.trim();
-
   if(!name)   return showToast('🌸 Please select your name!','error');
   if(!weight||weight<30||weight>300) return showToast('⚖️ Enter a valid weight (30–300 kg)!','error');
-
   const existing=allData[name]||{};
   const wks=sortedWeeks(existing);
   let finalH=height;
   if(!finalH&&wks.length) finalH=existing[wks[wks.length-1]].height||0;
-
   const entry={weight,height:finalH||0,calIn,calBurn,note,ts:Date.now()};
   if(!allData[name])allData[name]={};
   allData[name][weekKey]=entry;
   saveLocal(allData);
   renderAll();
-
   if(firebaseReady&&dataRef){
     const btn=document.getElementById('saveBtn');
     btn.disabled=true;btn.innerHTML='⏳ Syncing…';
@@ -859,7 +853,6 @@ function renderMemberToggles(){
 function getDatasets(){
   return MEMBERS.filter(m=>visibleMembers[m.name]).map(m=>{
     const entries=allData[m.name]||{};
-    // ✅ FIX: use WEEK_KEYS to look up — same keys used when saving
     const data=WEEK_KEYS.map(wk=>{
       const e=entries[wk];
       if(!e)return null;
@@ -905,7 +898,7 @@ function renderMainChart(){
 function setChartMode(m){chartMode=m;renderMainChart();}
 
 function renderCalWeekChart(){
-  const weekKey=document.getElementById('calWeekSel').value; // already a key
+  const weekKey=document.getElementById('calWeekSel').value;
   const labels=[],iD=[],bD=[];
   MEMBERS.forEach(m=>{
     const e=(allData[m.name]||{})[weekKey];
@@ -933,7 +926,8 @@ function renderSnapshots(){
     const wks=sortedWeeks(entries);
     const first=wks.length?entries[wks[0]]:null;
     const latest=wks.length?entries[wks[wks.length-1]]:null;
-    const lost=first&&latest?(first.weight-latest.weight).toFixed(1):null;
+    const lostKg=first&&latest?(first.weight-latest.weight).toFixed(1):null;
+    const lostPct=first&&lostKg&&first.weight>0?((parseFloat(lostKg)/first.weight)*100).toFixed(1):null;
     const bmi=latest&&latest.height?(latest.weight/Math.pow(latest.height/100,2)).toFixed(1):'—';
     const bmiCat=bmi!=='—'?getBmiCat(parseFloat(bmi)):{label:'—',color:'#b48ec0'};
     c.innerHTML+=`<div class="snap-card">
@@ -942,8 +936,9 @@ function renderSnapshots(){
       ${latest?`
         <div class="sval" style="color:var(--pink)">${latest.weight} kg</div>
         <div class="slbl">Current</div>
-        <div class="sval ${parseFloat(lost)>0?'loss':'gain'}" style="margin-top:10px">
-          ${parseFloat(lost)>0?'▼ ':'▲ '}${Math.abs(lost)} kg
+        <div class="sval ${parseFloat(lostKg)>0?'loss':'gain'}" style="margin-top:10px">
+          ${parseFloat(lostKg)>0?'▼ ':'▲ '}${Math.abs(lostKg)} kg
+          ${lostPct&&parseFloat(lostKg)>0?`<span style="font-size:.75rem">(${lostPct}%)</span>`:''}
         </div>
         <div class="slbl">vs Week 1</div>
         <div class="sbadge" style="background:${bmiCat.color}22;color:${bmiCat.color}">
@@ -961,15 +956,27 @@ function renderLeaderboard(){
     const wks=sortedWeeks(entries);
     const first=wks.length?entries[wks[0]]:null;
     const latest=wks.length?entries[wks[wks.length-1]]:null;
-    return{...m,lost:first&&latest?+(first.weight-latest.weight).toFixed(2):0};
+    const lostKg=first&&latest?+(first.weight-latest.weight).toFixed(2):0;
+    const lostPct=first&&first.weight>0?+((lostKg/first.weight)*100).toFixed(1):0;
+    return{...m,lost:lostKg,lostPct,startWeight:first?first.weight:null};
   }).sort((a,b)=>b.lost-a.lost);
+
   const medals=['🥇','🥈','🥉','4️⃣','5️⃣'];
   document.getElementById('lbList').innerHTML=scores.map((s,i)=>`
     <div class="lb-item">
       <div class="lb-rank">${medals[i]}</div>
       <div class="lb-avatar">${s.svgFn()}</div>
-      <div class="lb-name">${s.name}<br><span style="font-size:.75rem;color:var(--muted)">${s.gender==='male'?'♂ Male':'♀ Female'}</span></div>
-      <div class="lb-lost">${s.lost>0?'−'+s.lost+' kg 🎉':'No data yet'}</div>
+      <div class="lb-name">
+        ${s.name}<br>
+        <span style="font-size:.75rem;color:var(--muted)">${s.gender==='male'?'♂ Male':'♀ Female'}</span>
+        ${s.startWeight?`<br><span style="font-size:.72rem;color:var(--muted);font-weight:700">Start: ${s.startWeight} kg</span>`:''}
+      </div>
+      <div style="text-align:right">
+        ${s.lost>0?`
+          <div class="lb-lost">−${s.lost} kg 🎉</div>
+          <div><span class="lb-pct-badge">📉 ${s.lostPct}% lost</span></div>`
+        :'<div style="color:var(--muted);font-weight:700;font-size:.9rem">No data yet</div>'}
+      </div>
     </div>`).join('');
 }
 
@@ -985,21 +992,25 @@ function renderSummary(){
     }
     const first=entries[wks[0]];
     const latest=entries[wks[wks.length-1]];
-    const lost=(first.weight-latest.weight).toFixed(1);
+    const lostKg=(first.weight-latest.weight).toFixed(1);
+    const lostPct=first.weight>0?((parseFloat(lostKg)/first.weight)*100).toFixed(1):0;
     const bmi=latest.height?(latest.weight/Math.pow(latest.height/100,2)).toFixed(1):'—';
     tbody.innerHTML+=`<tr>
       <td><strong>${m.name}</strong></td>
       <td>${toLabel(wks[wks.length-1])}</td>
       <td>${latest.weight} kg</td>
       <td>${bmi}</td>
-      <td style="color:${parseFloat(lost)>0?'#059669':'#e11d48'};font-weight:800">${parseFloat(lost)>0?'−':''}${lost} kg</td>
+      <td style="color:${parseFloat(lostKg)>0?'#059669':'#e11d48'};font-weight:800">
+        ${parseFloat(lostKg)>0?'−':''}${lostKg} kg
+        ${parseFloat(lostKg)>0?`<br><span style="font-size:.75rem;font-weight:900;color:#059669">(${lostPct}%)</span>`:''}
+      </td>
       <td>${latest.calIn||'—'}</td>
       <td>${latest.calBurn||'—'}</td>
     </tr>`;
   });
 }
 
-// ── CALORIE CALC ──
+// ── CALORIE CALCULATOR ──
 function calcCalories(){
   const g  =document.getElementById('cGender').value;
   const age=+document.getElementById('cAge').value;
@@ -1045,13 +1056,17 @@ function renderTips(){
 
 // ── EXPORT CSV ──
 function exportCSV(){
-  let csv='Name,Week,Weight(kg),Height(cm),BMI,CalIntake,CalBurned,Net,Note\n';
+  let csv='Name,Week,Weight(kg),Height(cm),BMI,LostKg,LostPct,CalIntake,CalBurned,Net,Note\n';
   MEMBERS.forEach(m=>{
     const entries=allData[m.name]||{};
-    sortedWeeks(entries).forEach(wk=>{
+    const wks=sortedWeeks(entries);
+    const first=wks.length?entries[wks[0]]:null;
+    wks.forEach(wk=>{
       const e=entries[wk];
       const bmi=e.height?(e.weight/Math.pow(e.height/100,2)).toFixed(1):'';
-      csv+=`${m.name},${toLabel(wk)},${e.weight},${e.height||''},${bmi},${e.calIn||''},${e.calBurn||''},${(e.calIn||0)-(e.calBurn||0)},"${e.note||''}"\n`;
+      const lostKg=first?(first.weight-e.weight).toFixed(1):'';
+      const lostPct=first&&first.weight>0?((parseFloat(lostKg)/first.weight)*100).toFixed(1):'';
+      csv+=`${m.name},${toLabel(wk)},${e.weight},${e.height||''},${bmi},${lostKg},${lostPct}%,${e.calIn||''},${e.calBurn||''},${(e.calIn||0)-(e.calBurn||0)},"${e.note||''}"\n`;
     });
   });
   const a=document.createElement('a');
@@ -1060,7 +1075,7 @@ function exportCSV(){
   showToast('📥 CSV exported!');
 }
 
-// ── RESET ──
+// ── RESET ALL ──
 function resetAll(){
   if(!confirm('⚠️ Delete ALL data for ALL members? Cannot be undone!'))return;
   allData={};saveLocal({});
